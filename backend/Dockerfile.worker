@@ -1,0 +1,23 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# System-Abhängigkeiten installieren
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python-Dependencies installieren
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# App Code kopieren
+COPY . .
+
+# Umgebungsvariablen
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Data Collector Worker starten
+CMD ["python", "worker.py"]
