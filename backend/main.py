@@ -63,7 +63,7 @@ async def current_prices():
 @app.get("/api/v1/charts/price-comparison")
 async def chart_data(
     time_range: str = "24h",
-    provider_ids: list[int] = None
+    provider_ids: str = None  # Comma-separated string
 ):
     import random
     from datetime import datetime, timedelta
@@ -90,9 +90,14 @@ async def chart_data(
     # Provider filtern
     all_providers = ["aWATTar", "Tibber", "ENTSO-E"]
     if provider_ids:
-        provider_map = {1: "aWATTar", 2: "Tibber", 3: "ENTSO-E"}
-        selected_providers = [provider_map.get(id) for id in provider_ids if id in provider_map]
-        providers = [p for p in selected_providers if p]
+        # Parse comma-separated string to list of integers
+        try:
+            id_list = [int(id.strip()) for id in provider_ids.split(',') if id.strip()]
+            provider_map = {1: "aWATTar", 2: "Tibber", 3: "ENTSO-E"}
+            selected_providers = [provider_map.get(id) for id in id_list if id in provider_map]
+            providers = [p for p in selected_providers if p]
+        except (ValueError, AttributeError):
+            providers = all_providers
     else:
         providers = all_providers
     

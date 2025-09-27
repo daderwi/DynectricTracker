@@ -359,7 +359,7 @@ async function loadChartData() {
         
         // Nur ausgewählte Provider laden, wenn welche ausgewählt sind
         if (selectedProviders && selectedProviders.length > 0) {
-            selectedProviders.forEach(id => params.append('provider_ids', id));
+            params.set('provider_ids', selectedProviders.join(','));
         }
         
         const response = await fetch(`/api/v1/charts/price-comparison?${params}`);
@@ -381,8 +381,12 @@ async function loadChartData() {
 function renderChart(chartData) {
     const ctx = document.getElementById('priceChart').getContext('2d');
     
-    if (priceChart) {
-        priceChart.destroy();
+    if (priceChart && typeof priceChart.destroy === 'function') {
+        try {
+            priceChart.destroy();
+        } catch (error) {
+            console.warn('Fehler beim Zerstören des Price Charts:', error);
+        }
     }
     
     const datasets = Object.keys(chartData.datasets).map((providerName, index) => {
@@ -625,8 +629,8 @@ function renderChart(chartData) {
                     time: {
                         displayFormats: {
                             hour: 'HH:mm',
-                            day: 'DD.MM',
-                            month: 'MM/YY'
+                            day: 'dd.MM',
+                            month: 'MM/yy'
                         },
                         unit: getTimeUnit(chartData.time_range)
                     },
@@ -875,8 +879,12 @@ function renderDailyAveragesChart(data) {
     const ctx = document.getElementById('dailyAverageChart');
     if (!ctx) return;
     
-    if (window.dailyAverageChart) {
-        window.dailyAverageChart.destroy();
+    if (window.dailyAverageChart && typeof window.dailyAverageChart.destroy === 'function') {
+        try {
+            window.dailyAverageChart.destroy();
+        } catch (error) {
+            console.warn('Fehler beim Zerstören des Daily Average Charts:', error);
+        }
     }
     
     const chartData = data.hourly_averages.map(item => ({
@@ -1037,8 +1045,12 @@ function renderEnergySourcesChart(data) {
     const ctx = document.getElementById('energySourcesChart');
     if (!ctx) return;
     
-    if (window.energySourcesChart) {
-        window.energySourcesChart.destroy();
+    if (window.energySourcesChart && typeof window.energySourcesChart.destroy === 'function') {
+        try {
+            window.energySourcesChart.destroy();
+        } catch (error) {
+            console.warn('Fehler beim Zerstören des Energy Sources Charts:', error);
+        }
     }
     
     const hours = data.sources_data.map(item => item.hour);
